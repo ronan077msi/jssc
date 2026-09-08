@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pour toi</title>
+
+<!--
+  ============================================================
+  COMMENT PERSONNALISER CE SITE
+  ============================================================
+  1. Le prénom "Jessica" est déjà en place (cherche-le avec
+     Ctrl+F si tu veux le changer un jour).
+  2. PHOTO : dans la balise <img id="photo" ...> plus bas,
+     remplace la valeur de src par la photo encodée en base64
+     (comme ça tout reste dans un seul fichier, envoyable direct
+     sur WhatsApp, pas de dossier "assets" à côté).
+     Pour obtenir le base64 d'une photo :
+       - Le plus simple : va sur https://www.base64-image.de/,
+         dépose ta photo, copie le texte généré (il commence par
+         "data:image/jpeg;base64,...").
+       - En PowerShell (tu es sous Windows) :
+         [Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\chemin\photo.jpg"))
+         puis colle le résultat après "data:image/jpeg;base64,"
+     Colle tout ça (avec le préfixe data:image/...;base64,) comme
+     valeur de src="...". Le fichier sera plus gros mais restera
+     autonome, ce qui est exactement ce que tu veux pour l'envoyer.
+  3. Le texte de la lettre est dans <section class="letter">.
+  4. Les questions du bouton taquin sont dans le tableau
+     "attempts" à la fin du <script>.
+  ============================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --cream: #FBF1EC;
+    --blush: #F3DCD8;
+    --rose: #C05C74;
+    --wine: #6E2A3D;
+    --gold: #C79A5B;
+    --ink: #3A2530;
+    --ink-soft: #6B4E58;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection{ background: var(--rose); color: var(--cream); }
+
+  a, button{ font-family: inherit; }
+
+  :focus-visible{
+    outline: 2px solid var(--wine);
+    outline-offset: 4px;
+  }
+
+  /* ---------- Ambient petals (decorative, behind everything) ---------- */
+
+  .petals{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  .petal{
+    position: absolute;
+    top: -8vh;
+    width: 14px;
+    height: 14px;
+    background: var(--rose);
+    opacity: 0.35;
+    border-radius: 0 60% 0 60%;
+    animation: drift linear infinite;
+  }
+
+  .petal:nth-child(1){ left: 6%;  width: 10px; height: 10px; background: var(--gold); animation-duration: 19s; animation-delay: 0s; }
+  .petal:nth-child(2){ left: 18%; width: 16px; height: 16px; animation-duration: 24s; animation-delay: 3s; }
+  .petal:nth-child(3){ left: 32%; width: 9px;  height: 9px;  background: var(--gold); animation-duration: 16s; animation-delay: 6s; }
+  .petal:nth-child(4){ left: 48%; width: 13px; height: 13px; animation-duration: 22s; animation-delay: 1s; }
+  .petal:nth-child(5){ left: 63%; width: 11px; height: 11px; background: var(--gold); animation-duration: 18s; animation-delay: 5s; }
+  .petal:nth-child(6){ left: 77%; width: 15px; height: 15px; animation-duration: 26s; animation-delay: 8s; }
+  .petal:nth-child(7){ left: 89%; width: 10px; height: 10px; background: var(--gold); animation-duration: 20s; animation-delay: 2s; }
+
+  @keyframes drift{
+    0%   { transform: translateY(0) translateX(0) rotate(0deg);   opacity: 0; }
+    8%   { opacity: 0.35; }
+    92%  { opacity: 0.35; }
+    100% { transform: translateY(116vh) translateX(24px) rotate(200deg); opacity: 0; }
+  }
+
+  /* ---------- Layout shell ---------- */
+
+  main{ position: relative; z-index: 1; }
+
+  section{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8vh 6vw;
+    text-align: center;
+  }
+
+  /* ---------- Hero ---------- */
+
+  .hero .photo-frame{
+    width: clamp(96px, 18vw, 136px);
+    height: clamp(96px, 18vw, 136px);
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--rose);
+    box-shadow: 0 12px 30px -14px rgba(110, 42, 61, 0.55);
+    margin-bottom: 1.4rem;
+    opacity: 0;
+    animation: rise 1s ease-out 0s forwards;
+  }
+
+  .hero .photo-frame img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hero h1{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2.6rem, 8vw, 5.2rem);
+    line-height: 1.05;
+    color: var(--wine);
+    margin-top: 0.5rem;
+    opacity: 0;
+    animation: rise 1s ease-out 0.4s forwards;
+  }
+
+  .hero h1 em{
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  .hero p{
+    max-width: 34ch;
+    margin: 1.6rem auto 0;
+    font-size: clamp(1rem, 2vw, 1.15rem);
+    color: var(--ink-soft);
+    line-height: 1.7;
+    opacity: 0;
+    animation: rise 1s ease-out 0.8s forwards;
+  }
+
+  .hero .scroll-hint{
+    margin-top: 3.5rem;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    opacity: 0;
+    animation: rise 1s ease-out 1.2s forwards;
+    transition: color 0.3s ease;
+  }
+
+  .hero .scroll-hint:hover{ color: var(--rose); }
+
+  .hero .scroll-hint .line{
+    width: 1px;
+    height: 34px;
+    background: var(--ink-soft);
+    animation: stretch 2.2s ease-in-out infinite;
+    transform-origin: top;
+  }
+
+  @keyframes rise{
+    from{ opacity: 0; transform: translateY(18px); }
+    to  { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes stretch{
+    0%, 100% { transform: scaleY(0.6); opacity: 0.5; }
+    50%      { transform: scaleY(1);   opacity: 1;   }
+  }
+
+  /* ---------- Letter ---------- */
+
+  .letter{
+    background: linear-gradient(180deg, var(--cream) 0%, var(--blush) 100%);
+  }
+
+  .letter .frame{
+    max-width: 620px;
+  }
+
+  .letter .kicker{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    color: var(--rose);
+    font-size: clamp(1.2rem, 2.6vw, 1.5rem);
+    margin-bottom: 1.2rem;
+  }
+
+  .letter p{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+    line-height: 1.8;
+    color: var(--ink);
+    margin-bottom: 1.4rem;
+    text-align: left;
+  }
+
+  /* Le texte reste visible par défaut. L'effet d'apparition
+     progressive au scroll ne s'active que si le JavaScript a
+     pu tourner (voir le script tout en haut du body) — comme
+     ça, si le JS est bloqué (ex: aperçu WhatsApp), la lettre
+     reste lisible au lieu de rester invisible. */
+  .js .letter p{
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+
+  .js .letter p.in-view{
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .letter .signature{
+    margin-top: 2.2rem;
+    font-style: italic;
+    color: var(--wine);
+    text-align: right;
+    font-size: clamp(1.3rem, 2.6vw, 1.7rem);
+  }
+
+  /* ---------- Closing / call to heart ---------- */
+
+  .closing h2{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    color: var(--wine);
+    max-width: 16ch;
+    line-height: 1.15;
+  }
+
+  .closing .sub{
+    margin-top: 1rem;
+    color: var(--ink-soft);
+    font-size: clamp(0.95rem, 2vw, 1.05rem);
+  }
+
+  .heart-btn{
+    margin-top: 2.6rem;
+    background: var(--wine);
+    color: var(--cream);
+    border: none;
+    padding: 0.95rem 2.2rem;
+    border-radius: 999px;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 8px 24px -12px rgba(110, 42, 61, 0.6);
+  }
+
+  .heart-btn:hover{
+    background: var(--rose);
+    transform: translateY(-2px);
+  }
+
+  .heart-btn:active{ transform: translateY(0) scale(0.98); }
+
+  .heart-btn svg{
+    width: 18px;
+    height: 18px;
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes pulse{
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
+  }
+
+  .heart-burst{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .heart-burst span{
+    position: absolute;
+    font-size: 1.4rem;
+    color: var(--rose);
+    animation: float-up 2.4s ease-out forwards;
+  }
+
+  @keyframes float-up{
+    0%   { transform: translateY(0) scale(0.6); opacity: 0; }
+    12%  { opacity: 1; }
+    100% { transform: translateY(-70vh) scale(1.1); opacity: 0; }
+  }
+
+  /* ---------- Teasing question section ---------- */
+
+  .tease{
+    background: var(--wine);
+    color: var(--cream);
+  }
+
+  .tease .box{
+    max-width: 460px;
+    width: 100%;
+  }
+
+  .tease h2{
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 500;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    margin-bottom: 2.2rem;
+    line-height: 1.2;
+    transition: opacity 0.4s ease;
+  }
+
+  .tease .choices{
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .tease button{
+    border: none;
+    padding: 0.85rem 2rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .tease .yes-btn{
+    background: var(--gold);
+    color: var(--wine);
+  }
+
+  .tease .yes-btn:hover{ transform: translateY(-2px) scale(1.03); }
+
+  .tease .no-btn{
+    background: transparent;
+    color: var(--cream);
+    border: 1px solid rgba(251, 241, 236, 0.5);
+  }
+
+  .tease .no-btn:hover{
+    border-color: var(--cream);
+  }
+
+  .tease .result-card{
+    background: var(--cream);
+    color: var(--ink);
+    border-radius: 18px;
+    padding: 2.4rem 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    opacity: 0;
+    transform: scale(0.92);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .tease .result-card.show{
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  footer{
+    text-align: center;
+    padding: 3rem 6vw 4rem;
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- Small screens ---------- */
+
+  @media (max-width: 480px){
+    section{ padding: 10vh 7vw; }
+    .letter p{ text-align: left; }
+  }
+
+  /* ---------- Respect reduced motion ---------- */
+
+  @media (prefers-reduced-motion: reduce){
+    *{
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    .hero .photo-frame, .hero h1, .hero p, .hero .scroll-hint{
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .letter p{ opacity: 1; transform: none; }
+    .petal{ display: none; }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<div class="petals" aria-hidden="true">
+  <div class="petal"></div>
+  <div class="petal"></div>
+  <div class="petal"></div>
+  <div class="petal"></div>
+  <div class="petal"></div>
+  <div class="petal"></div>
+  <div class="petal"></div>
+</div>
+
+<main>
+
+  <section class="hero">
+    <div class="photo-frame">
+      <!-- Remplace ce src par ta photo en base64, voir instructions tout en haut du fichier -->
+      <img id="photo" alt="Jessica" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23F3DCD8'/%3E%3Ctext x='50' y='56' font-size='34' text-anchor='middle' fill='%23C05C74'%3E%E2%99%A5%3C/text%3E%3C/svg%3E">
+    </div>
+    <h1>Pour toi, <em>Jessica</em></h1>
+    <p>J'ai un truc à te dire. Rien de grave, promis. Enfin... ça dépend comment tu le prends.</p>
+    <a href="#letter" class="scroll-hint">
+      <span>Lire la suite</span>
+      <span class="line" aria-hidden="true"></span>
+    </a>
+  </section>
+
+  <section class="letter" id="letter">
+    <div class="frame">
+      <p class="kicker">Jessica,</p>
+
+      <p>J'étais là, posé en pleine pause au milieu du bordel ambiant de la journée, à essayer de déconnecter deux minutes de mon mémoire et des galères. Et là, qu'est-ce qui se passe ? Mon cerveau décide de faire une fixette sur toi.</p>
+
+      <p>Au lieu de faire un truc normal, je me suis dit : « Vas-y, je vais coder un truc juste pour elle ». Oui, je sais, c'est grave docteur. J'ai passé mon temps à taper des lignes de code et à régler des balises juste pour te faire lever les yeux au ciel (ou sourire, avoue).</p>
+
+      <p>Faut dire que t'as ce don énervant mais irrésistible de squatter mes pensées sans prévenir. Entre ton rire qui couvre tout le bureau, tes répliques à la con et ton talent pour semer la zizanie, tu rends mes journées ici beaucoup moins insupportables.</p>
+
+      <p>Bref, j'ai mis du cœur (et un peu trop d'heures de code) là-dedans. Dis-moi si tu valides mon chef-d'œuvre, ou si tu vas encore trouver le moyen de râler !</p>
+
+      <p class="signature">— Ronan</p>
+    </div>
+  </section>
+
+  <section class="closing">
+    <h2>Ce que je voulais surtout que tu retiennes</h2>
+    <p class="sub">C'est vrai, tout simplement.</p>
+    <button class="heart-btn" id="heartBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.1C.86 10.2 1.4 6.9 4.1 5.4c2.2-1.2 4.7-.5 6.1 1.3.4.5 1.2.5 1.6 0 1.4-1.8 3.9-2.5 6.1-1.3 2.7 1.5 3.24 4.8 1.4 7.5C18.7 16.65 12 21 12 21z"/></svg>
+      Je t'aime
+    </button>
+  </section>
+
+  <section class="tease">
+    <div class="box">
+      <h2 id="teaseQuestion">Bon, sérieusement... tu veux être avec moi ?</h2>
+
+      <div class="choices" id="teaseChoices">
+        <button class="yes-btn" id="yesBtn" type="button">Oui</button>
+        <button class="no-btn" id="noBtn" type="button">Non</button>
+      </div>
+
+      <div class="result-card" id="resultCard"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>fait avec le cœur, pour Jessica.</footer>
+
+<div class="heart-burst" id="heartBurst" aria-hidden="true"></div>
+
+<script>
+  // Reveal each letter paragraph as it scrolls into view
+  const paragraphs = document.querySelectorAll('.letter p');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting){
+        setTimeout(() => entry.target.classList.add('in-view'), i * 40);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  paragraphs.forEach(p => io.observe(p));
+
+  // Little heart burst on click, respecting reduced-motion users
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const burstLayer = document.getElementById('heartBurst');
+
+  document.getElementById('heartBtn').addEventListener('click', () => {
+    if (prefersReducedMotion) return;
+    for (let i = 0; i < 14; i++){
+      const heart = document.createElement('span');
+      heart.textContent = '♥';
+      heart.style.left = (45 + Math.random() * 10) + 'vw';
+      heart.style.bottom = '6vh';
+      heart.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
+      heart.style.animationDelay = (Math.random() * 0.4) + 's';
+      heart.style.transform = `translateX(${(Math.random() - 0.5) * 200}px)`;
+      burstLayer.appendChild(heart);
+      setTimeout(() => heart.remove(), 2800);
+    }
+  });
+
+  // Teasing "veux-tu être avec moi" question, with a few playful re-asks on "Non"
+  const teaseQuestion = document.getElementById('teaseQuestion');
+  const teaseChoices = document.getElementById('teaseChoices');
+  const yesBtn = document.getElementById('yesBtn');
+  const noBtn = document.getElementById('noBtn');
+  const resultCard = document.getElementById('resultCard');
+
+  const attempts = [
+    "Bon, sérieusement... tu veux être avec moi ?",
+    "Aïe. Ok, je retente : et si on commençait par un café, juste tous les deux ?",
+    "T'es dure en affaires... alors, une sortie, sans pression, ça te dit ?",
+    "Dernière proposition, promis : on en discute juste tranquillement, toi et moi ?"
+  ];
+  let attemptIndex = 0;
+
+  function showResultCard(html){
+    teaseQuestion.style.display = 'none';
+    teaseChoices.style.display = 'none';
+    resultCard.innerHTML = html;
+    requestAnimationFrame(() => resultCard.classList.add('show'));
+  }
+
+  yesBtn.addEventListener('click', () => {
+    showResultCard('Je t\'aime bien toi. 💛<br><span style="font-size:0.7em; opacity:0.75;">(et beaucoup plus que "bien", en vrai)</span>');
+  });
+
+  noBtn.addEventListener('click', () => {
+    attemptIndex++;
+    if (attemptIndex < attempts.length){
+      teaseQuestion.style.opacity = '0';
+      setTimeout(() => {
+        teaseQuestion.textContent = attempts[attemptIndex];
+        teaseQuestion.style.opacity = '1';
+      }, 250);
+    } else {
+      showResultCard('Pas de souci, c\'est noté et je respecte ça. 🙂<br><span style="font-size:0.7em; opacity:0.75;">Merci d\'avoir quand même lu jusque-là.</span>');
+    }
+  });
+</script>
+
+</body>
+</html>
