@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pour toi Jessica Andriamihaja</title>
+<title>Salut</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -199,12 +199,7 @@
     margin-bottom: 1.4rem;
     text-align: left;
   }
-
-  /* Le texte reste visible par défaut. L'effet d'apparition
-     progressive au scroll ne s'active que si le JavaScript a
-     pu tourner (voir le script tout en haut du body) — comme
-     ça, si le JS est bloqué (ex: aperçu WhatsApp), la lettre
-     reste lisible au lieu de rester invisible. */
+  
   .js .letter p{
     opacity: 0;
     transform: translateY(16px);
@@ -422,7 +417,7 @@
       <!-- Remplace ce src par ta photo en base64, voir instructions tout en haut du fichier -->
       <img id="photo" alt="Jessica" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23F3DCD8'/%3E%3Ctext x='50' y='56' font-size='34' text-anchor='middle' fill='%23C05C74'%3E%E2%99%A5%3C/text%3E%3C/svg%3E">
     </div>
-    <h1>Pour toi, <em>Jessica</em></h1>
+    <h1>Pour toi, <em>Nirina</em></h1>
     <p>J'ai un truc à te dire. Rien de grave, promis. Enfin... ça dépend comment tu le prends.</p>
     <a href="#letter" class="scroll-hint">
       <span>Lire la suite</span>
@@ -430,17 +425,17 @@
     </a>
   </section>
 
-  <section class="letter" id="letter">
+ <section class="letter" id="letter">
     <div class="frame">
-      <p class="kicker">Jessica,</p>
+      <p class="kicker">Nirina,</p>
 
-      <p>J'étais là, posé en pleine pause au milieu du bordel ambiant de la journée, à essayer de déconnecter deux minutes de mon mémoire et des galères. Et là, qu'est-ce qui se passe ? Mon cerveau décide de faire une fixette sur toi.</p>
+      <p>Il a fallu que je me pose devant mon écran pour me rendre compte d'un truc : t'es devenue une habitude un peu trop facile dans mes journées, et bizarrement, je ne m'en plains même pas.</p>
 
-      <p>Au lieu de faire un truc normal, je me suis dit : « Vas-y, je vais coder un truc juste pour elle ». Oui, je sais, c'est grave docteur. J'ai passé mon temps à taper des lignes de code et à régler des balises juste pour te faire lever les yeux au ciel (ou sourire, avoue).</p>
+      <p>Au lieu de faire un truc classique, j'ai préféré coder cette petite page rien que pour toi. Oui, je sais, utiliser mes lignes de code pour essayer de t'arracher un sourire, c'est un peu ma façon à moi de déclarer forfait face à ton petit caractère.</p>
 
-      <p>Faut dire que t'as ce don énervant mais irrésistible de squatter mes pensées sans prévenir. Entre ton rire qui couvre tout le bureau, tes répliques à la con et ton talent pour semer la zizanie, tu rends mes journées ici beaucoup moins insupportables.</p>
+      <p>Entre ton sens de l'répartie, ton talent pour me chercher des noises et ta manie de squatter mes pensées sans prévenir, tu rends tout de suite les choses beaucoup moins ennuyeuses.</p>
 
-      <p>Bref, j'ai mis du cœur (et un peu trop d'heures de code) là-dedans. Dis-moi si tu valides mon chef-d'œuvre, ou si tu vas encore trouver le moyen de râler !</p>
+      <p>Bref, j'ai mis du soin (et un peu trop de CSS) dans ce petit coin du web. Dis-moi si tu valides, ou si tu vas trouver le moyen de critiquer !</p>
 
       <p class="signature">— Ronan</p>
     </div>
@@ -448,16 +443,16 @@
 
   <section class="closing">
     <h2>Ce que je voulais surtout que tu retiennes</h2>
-    <p class="sub">C'est vrai, tout simplement.</p>
+    <p class="sub">C'est de l'inspiraka sendra nandralo</p>
     <button class="heart-btn" id="heartBtn" type="button">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-6.7-4.35-9.3-8.1C.86 10.2 1.4 6.9 4.1 5.4c2.2-1.2 4.7-.5 6.1 1.3.4.5 1.2.5 1.6 0 1.4-1.8 3.9-2.5 6.1-1.3 2.7 1.5 3.24 4.8 1.4 7.5C18.7 16.65 12 21 12 21z"/></svg>
-      Je t'aime
+      Tu valides ?
     </button>
   </section>
 
   <section class="tease">
     <div class="box">
-      <h2 id="teaseQuestion">Bon, sérieusement... tu veux être avec moi ?</h2>
+      <h2 id="teaseQuestion">Bon, sérieusement... tu veux être avec Jesus ? ?</h2>
 
       <div class="choices" id="teaseChoices">
         <button class="yes-btn" id="yesBtn" type="button">Oui</button>
@@ -470,7 +465,7 @@
 
 </main>
 
-<footer>fait avec le cœur, pour Jessica.</footer>
+<footer>fait avec le cœur, pour Nirina.</footer>
 
 <div class="heart-burst" id="heartBurst" aria-hidden="true"></div>
 
@@ -541,7 +536,7 @@
         teaseQuestion.style.opacity = '1';
       }, 250);
     } else {
-      showResultCard('Kiiii 🙂<br><span style="font-size:0.7em; opacity:0.75;">Zetemo foana.</span>');
+      showResultCard('Kiiii 🙂<br><span style="font-size:0.7em; opacity:0.75;">Haha</span>');
     }
   });
 </script>
